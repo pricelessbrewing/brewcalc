@@ -4,7 +4,8 @@ declare var expect: any;
 import {
   bitternessIbuTinseth,
   bitternessRatio,
-  bitternessIbuRager
+  bitternessIbuRager,
+  bitternessIbuGaretz
 } from '../hops'
 import { originalGravity, gravityPoints, finalGravity } from '../brewcalc'
 import { calculateVolumes } from '../volumes'
@@ -89,4 +90,19 @@ test('bitternessIbuRager', () => {
     )
   ).toBeCloseTo(21, 0)
   //22.2 by beerSmith, I suppose that there is additional ajustments depends of the Hop form
+})
+
+test('bitternessIbuGaretz', () => {
+  const ogAussieAle = originalGravity(
+    AussieAle.batchSize,
+    gravityPoints(AussieAle, AussieAleEquipment)
+  )
+  expect(
+    bitternessIbuGaretz(
+      AussieAle,
+      ogAussieAle,
+      AussieAleEquipment.batchSize,
+      calculateVolumes(AussieAle, AussieAleEquipment).estPreBoilVolume
+    )
+  ).toBeCloseTo(28, 0)
 })

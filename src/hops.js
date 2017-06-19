@@ -83,3 +83,47 @@ export const bitternessIbuRager = (
         litersToGallons(postBoilVolume)
       ))
   )
+
+//garetz
+//http://www.straighttothepint.com/ibu-calculator/
+const garetz_hop_ibu = (amount, alpha, time, og, batchSize, boilSize) => {
+  if (time <= 0 || amount <= 0 || alpha < 0) return 0
+
+  const cf = batchSize / boilSize
+  const bg = cf * (og - 1) + 1
+  const gf = (bg - 1.050) / 0.2 + 1.0
+
+  //TF = ((Elevation in feet) / 550) * 0.02) + 1
+  const tf = 1.2
+
+  let ibu_guess = 1.0
+  let ibu = 50
+
+  while (Math.abs(ibu_guess - ibu) > 0.05) {
+    ibu_guess = ibu
+    const utilization = 7.2994 + 15.0746 * Math.tanh((time - 21.86) / 24.71)
+    const hf = cf * ibu_guess / 260 + 1
+    const ca = gf * hf * tf
+    ibu = utilization * alpha * amount * 0.749 / (batchSize * ca)
+  }
+
+  return ibu
+}
+
+export const bitternessIbuGaretz = (
+  { hops }: Recipe,
+  boilingGravity: number,
+  batchSize: number,
+  boilVolume: number
+) =>
+  sum(
+    hops.map(({ amount, alpha, time }: Hop) =>
+      garetz_hop_ibu(
+        kgToOunces(amount),
+        alpha * 100,
+        time,
+        boilingGravity,
+        litersToGallons(batchSize),
+        litersToGallons(boilVolume)
+      ))
+  )
